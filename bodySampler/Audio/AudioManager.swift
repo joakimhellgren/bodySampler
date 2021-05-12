@@ -44,7 +44,7 @@ class AudioManager {
         }
         
         
-        return currentPrediction != PredictionLabel.other.rawValue || currentPrediction != PredictionLabel.none.rawValue
+        return currentPrediction == PredictionLabel.kick.rawValue
     }
     
     func observeMotions(poses: BodyPoints?) {
