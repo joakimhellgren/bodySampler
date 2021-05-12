@@ -31,8 +31,9 @@ class AppViewController: UIViewController {
         camera.delegate = self
         
     }
-    
 }
+
+// MARK: - AudioManagerDelegate
 
 extension AppViewController: AudioManagerDelegate {
     func audioManager(_ audioManager: AudioManager, didSet loopState: Bool) {
@@ -40,20 +41,21 @@ extension AppViewController: AudioManagerDelegate {
             self.loopStateLabel.text = loopState ? "Looping: enabled" : "Looping: disabled"
         }
     }
-    
-    
 }
+
+// MARK: - CameraDelegate
 
 extension AppViewController: CameraDelegate {
     func camera(_ camera: Camera, didCreate framePublisher: FramePublisher) {
         
         processorChain.upstreamFramePublisher = framePublisher
     }
-    
-    
 }
 
+// MARK: - ProcessorChainDelegate
+
 extension AppViewController: ProcessorChainDelegate {
+    
     func processorChain(_ chain: ProcessorChain, didDetect poses: [Human]?, in frame: DataFrame) {
         DispatchQueue.global(qos: .userInteractive).async {
             self.drawScreen(frame.image)
@@ -61,22 +63,18 @@ extension AppViewController: ProcessorChainDelegate {
     }
     
     func processorChain(_ chain: ProcessorChain, didPredict prediction: Prediction, for frames: Int) {
-        
-        DispatchQueue.main.async {
-            self.predictionLabel.text = prediction.label
-        }
-        
+
+        updateActionLabel(prediction.label)
         audioManager.validatePrediction(prediction)
     }
     
     func processorChain(_ chain: ProcessorChain, extractedPoints points: BodyPoints) {
         self.audioManager.observeMotions(poses: points)
     }
-    
-    
 }
 
 extension AppViewController {
+    
     private func drawScreen(_ frame: CGImage) {
         
         let renderFormat = UIGraphicsImageRendererFormat()
@@ -96,8 +94,14 @@ extension AppViewController {
             cgContext.draw(frame, in: imageRect)
         }
         
-        DispatchQueue.main.async {
-            self.imageView.image = frames
+        DispatchQueue.main.async { self.imageView.image = frames }
+    }
+    
+    private func updateActionLabel(_ label: String) {
+        if label == PredictionLabel.none.rawValue || label == PredictionLabel.other.rawValue {
+            return
         }
+        
+        DispatchQueue.main.async { self.predictionLabel.text = "Latest action: \(label)" }
     }
 }

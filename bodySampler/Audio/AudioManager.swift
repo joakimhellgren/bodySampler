@@ -38,36 +38,14 @@ class AudioManager {
         currentPrediction = validPrediction.label
         confidence = validPrediction.confidence
         
-        if currentPrediction == PredictionLabel.duck.rawValue { isLooping.toggle() }
-        delegate?.audioManager(self, didSet: self.isLooping)
+        if currentPrediction == PredictionLabel.duck.rawValue {
+            isLooping.toggle()
+            delegate?.audioManager(self, didSet: self.isLooping)
+        }
+        
         
         return currentPrediction == PredictionLabel.kick.rawValue
     }
-    
-    private func playAudio(_ shouldPlay: Bool) {
-        
-        if !shouldPlay { return }
-        
-        if let player = player, player.isPlaying {
-            player.stop()
-        }
-        let urlString = Bundle.main.path(forResource: isLooping ? "truck" : "kick", ofType: "wav")
-        
-        do {
-            try AVAudioSession.sharedInstance().setMode(.default)
-            try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
-            
-            guard let urlString = urlString else { return }
-            
-            player = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: urlString))
-            guard let player = player else { return }
-            player.numberOfLoops = isLooping ? -1 : 0
-            player.play()
-        } catch let error {
-            print("Error playing sound: \(error)")
-        }
-    }
-    
     
     func observeMotions(poses: BodyPoints?) {
         
@@ -76,7 +54,8 @@ class AudioManager {
               !poses.locationY.isEmpty else { return }
         
         pitchControl.rate = Float(poses.locationY[1]) * 2
-        reverb.wetDryMix = Float(poses.locationY[5]) * 100
+        pitchControl.pitch = Float(poses.locationY[1]) * 1000
+        reverb.wetDryMix = Float(poses.locationY[5]) * 80
     }
     
     private func playSound(_ shouldPlay: Bool) {
@@ -84,7 +63,7 @@ class AudioManager {
         if !shouldPlay { return }
         if audioPlayer.isPlaying { audioPlayer.stop() }
         
-        audioPlayer.play()
+        if !audioPlayer.isPlaying && !isLooping { audioPlayer.play() }
     }
     
     
@@ -92,10 +71,10 @@ class AudioManager {
         if !shouldPlay { return }
         if audioPlayer.isPlaying { audioPlayer.stop() }
         
-        audioPlayer.volume = 1.0
-        reverb.wetDryMix = 50.0
+        audioPlayer.volume = 0.8
+        reverb.wetDryMix = 20.0
 
-        let path = Bundle.main.path(forResource: "kick", ofType: "wav")!
+        let path = Bundle.main.path(forResource: isLooping ? "truck" : "kick", ofType: "wav")!
         let url = NSURL.fileURL(withPath: path)
 
         let file = try? AVAudioFile(forReading: url)
