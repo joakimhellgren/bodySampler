@@ -44,7 +44,7 @@ class AudioManager {
         }
         
         
-        return currentPrediction == PredictionLabel.kick.rawValue
+        return currentPrediction != PredictionLabel.other.rawValue || currentPrediction != PredictionLabel.none.rawValue
     }
     
     func observeMotions(poses: BodyPoints?) {
@@ -72,7 +72,7 @@ class AudioManager {
         if audioPlayer.isPlaying { audioPlayer.stop() }
         
         audioPlayer.volume = 0.8
-        reverb.wetDryMix = 20.0
+        reverb.wetDryMix = 10.0
 
         let path = Bundle.main.path(forResource: isLooping ? "truck" : "kick", ofType: "wav")!
         let url = NSURL.fileURL(withPath: path)
