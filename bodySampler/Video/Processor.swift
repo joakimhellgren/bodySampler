@@ -26,15 +26,18 @@ struct ProcessorChain {
     
     weak var delegate: ProcessorChainDelegate?
     
+    /// when set; begins to extract poses and predict actions.
     var upstreamFramePublisher: AnyPublisher<Frame, Never>! {
         didSet { buildProcessorChain() }
     }
-    
+    /// cancellation for the active processing chain
     private var frameProcessorChain: AnyCancellable?
     private let humanBodyPoseRequest = VNDetectHumanBodyPoseRequest()
     private let classifier = DoubleActionClassifier.shared
     
+    /// how many frames we need to make a prediction
     private let predictionWindowSize: Int
+    /// frequency of predictions
     private let windowStride = 15
     
     init() {
@@ -48,14 +51,23 @@ extension ProcessorChain {
         
         guard upstreamFramePublisher != nil else { return }
         
+        /// transforms video frames from upstreamFramePublisher
         frameProcessorChain = upstreamFramePublisher
+            /// convert frame(s) to CGImages, skip nil's with compactMap
             .compactMap(imageFromFrame)
+            /// Detect any (if any) humans in frame
             .map(findPosesInFrame)
+            /// if more than one person is found filter out the ones that take up a smaller area of the screen
             .map(isolateLargestPose)
+            /// publish locations of human body parts as a multiarray to next subscriber
             .map(multiArrayFromPose)
+            /// gather the window of multiarrays, starting with empty window
             .scan([MLMultiArray?](), gatherWindow)
+            /// only pases when the window has enough data
             .filter(gateWindow)
+            /// make an prediction from the accurate window
             .map(predictActionWithWindow)
+            /// send prediction to delegate
             .sink(receiveValue: sendPrediction)
     }
 }

@@ -36,6 +36,7 @@ class Camera: NSObject {
 extension Camera: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput frame: Frame, from connection: AVCaptureConnection) {
         
+        /// send frames to publisher
         framePublisher?.send(frame)
     }
 }
@@ -44,7 +45,7 @@ extension Camera: AVCaptureVideoDataOutputSampleBufferDelegate {
 extension Camera {
     
     private func createFramePublisher() {
-        
+        /// configure / reconfigure session
         guard let dataOutput = configureSession() else { return }
         
         /// create a new passthrough subject that publishes frames to subscribers

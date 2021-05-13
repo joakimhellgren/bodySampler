@@ -8,9 +8,16 @@
 import AVFoundation
 
 protocol AudioManagerDelegate: AnyObject {
+    
     func audioManager(_ audioManager: AudioManager, didSet loopState: Bool)
 }
 
+enum AudioState: String, CaseIterable {
+    case playState
+    case configState
+    
+    static var currentState: AudioState = .configState
+}
 
 class AudioManager {
     weak var delegate: AudioManagerDelegate?
@@ -27,48 +34,58 @@ class AudioManager {
     private let pitchControl = AVAudioUnitTimePitch()
     private let reverb = AVAudioUnitReverb()
     
-    func validatePrediction(_ prediction: Prediction) {
-        
-        if currentPrediction == prediction.label { return }
-        configureAudioSession(configureAudioState(prediction))
-    }
-    
-    private func configureAudioState(_ validPrediction: Prediction) -> Bool {
-        
-        currentPrediction = validPrediction.label
-        confidence = validPrediction.confidence
-        
-        if currentPrediction == PredictionLabel.duck.rawValue {
-            isLooping.toggle()
-            delegate?.audioManager(self, didSet: self.isLooping)
-        }
-        
-        
-        return currentPrediction == PredictionLabel.kick.rawValue
-    }
-    
     func observeMotions(poses: BodyPoints?) {
         
         guard let poses = poses,
               !poses.locationX.isEmpty,
               !poses.locationY.isEmpty else { return }
         
+        /// the poses array will always either 0 or all body parts (18)
+        /// right hand will alwats be second item and the left hand will always be the sixth.
         pitchControl.rate = Float(poses.locationY[1]) * 2
         pitchControl.pitch = Float(poses.locationY[1]) * 1000
         reverb.wetDryMix = Float(poses.locationY[5]) * 80
     }
     
-    private func playSound(_ shouldPlay: Bool) {
+    func validatePrediction(_ prediction: Prediction) {
         
-        if !shouldPlay { return }
-        if audioPlayer.isPlaying { audioPlayer.stop() }
+        /// since we do not want to retrigger the audio manager methods after an action is performed with valid data
+        /// we make sure that the incoming data is of a negative class before we let it pass on to the next function.
+        if currentPrediction == prediction.label { return }
         
-        if !audioPlayer.isPlaying && !isLooping { audioPlayer.play() }
+        /// takes a prediction and performs conditional checks for configuring audio states (i.e play sound vs. configure audio looping)
+        configureAudioSession(configureAudioState(prediction))
     }
     
+}
+
+extension AudioManager {
+    private func configureAudioState(_ validPrediction: Prediction) -> Bool {
+        
+        /// set the local var to the validated prediction name
+        currentPrediction = validPrediction.label
+        /// set the local var to the validated confidence
+        confidence = validPrediction.confidence
+        
+        if currentPrediction == PredictionLabel.duck.rawValue {
+            /// if the user ducked toggle the looping effect on/off and send the state to the loop label on the view controller
+            isLooping.toggle()
+            /// Send the loop state to the view controller to update label for looping status
+            delegate?.audioManager(self, didSet: self.isLooping)
+            AudioState.currentState = .configState
+        } else {
+            /// else prepare the manager to play a sound
+            AudioState.currentState = .playState
+        }
+        
+        /// return true / false depending on state
+        return AudioState.currentState == .playState
+    }
     
-    func configureAudioSession(_ shouldPlay: Bool) {
+    private func configureAudioSession(_ shouldPlay: Bool) {
+        /// if audio state is != playState just discard.
         if !shouldPlay { return }
+        
         if audioPlayer.isPlaying { audioPlayer.stop() }
         
         audioPlayer.volume = 0.8
@@ -82,8 +99,7 @@ class AudioManager {
         let buffer = AVAudioPCMBuffer(pcmFormat: file!.processingFormat,
                                       frameCapacity: AVAudioFrameCount(file!.length))
         
-        do { try file!.read(into: buffer!) }
-        catch _ { }
+        do { try file!.read(into: buffer!) } catch _ { }
 
         engine.attach(audioPlayer)
         engine.attach(pitchControl)
@@ -95,13 +111,12 @@ class AudioManager {
         engine.connect(pitchControl, to: reverb, format: buffer?.format)
         engine.connect(reverb, to: engine.mainMixerNode, format: buffer?.format)
 
+        /// configure buffer to match audio state (i.e will loop or interupt depending on state.
         audioPlayer.scheduleBuffer(buffer!, at: nil, options: isLooping ? AVAudioPlayerNodeBufferOptions.loops : AVAudioPlayerNodeBufferOptions.interrupts , completionHandler: nil)
 
         engine.prepare()
-        do {
-            try engine.start()
-        } catch _ {
-        }
+        
+        do { try engine.start() } catch _ { }
         
         audioPlayer.play()
     }
