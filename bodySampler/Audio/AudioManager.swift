@@ -12,13 +12,6 @@ protocol AudioManagerDelegate: AnyObject {
     func audioManager(_ audioManager: AudioManager, didSet loopState: Bool)
 }
 
-enum AudioState: String, CaseIterable {
-    case playState
-    case configState
-    
-    static var currentState: AudioState = .configState
-}
-
 class AudioManager {
     weak var delegate: AudioManagerDelegate?
     
@@ -34,6 +27,7 @@ class AudioManager {
     private let pitchControl = AVAudioUnitTimePitch()
     private let reverb = AVAudioUnitReverb()
     
+
     func observeMotions(poses: BodyPoints?) {
         
         guard let poses = poses,
@@ -62,24 +56,20 @@ class AudioManager {
 extension AudioManager {
     private func configureAudioState(_ validPrediction: Prediction) -> Bool {
         
-        /// set the local var to the validated prediction name
+        /// store ref to validated prediction name
         currentPrediction = validPrediction.label
-        /// set the local var to the validated confidence
+        /// store ref to validated confidence
         confidence = validPrediction.confidence
         
         if currentPrediction == PredictionLabel.duck.rawValue {
-            /// if the user ducked toggle the looping effect on/off and send the state to the loop label on the view controller
+            
             isLooping.toggle()
-            /// Send the loop state to the view controller to update label for looping status
-            delegate?.audioManager(self, didSet: self.isLooping)
-            AudioState.currentState = .configState
-        } else {
-            /// else prepare the manager to play a sound
-            AudioState.currentState = .playState
         }
+        delegate?.audioManager(self, didSet: self.isLooping)
+        
         
         /// return true / false depending on state
-        return AudioState.currentState == .playState
+        return currentPrediction == PredictionLabel.kick.rawValue
     }
     
     private func configureAudioSession(_ shouldPlay: Bool) {
