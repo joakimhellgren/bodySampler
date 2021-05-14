@@ -12,6 +12,7 @@ class AppViewController: UIViewController {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet weak var predictionLabel: UILabel!
     @IBOutlet weak var loopStateLabel: UILabel!
+    @IBOutlet weak var currentSampleLabel: UILabel!
     
     var audioManager: AudioManager!
     var camera: Camera!
@@ -20,6 +21,10 @@ class AppViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         UIApplication.shared.isIdleTimerDisabled = true
+        
+        currentSampleLabel.text = "Selected sample: \(AudioState.currentSample.rawValue)"
+        predictionLabel.text = "Latest action: \(PredictionLabel.kick.rawValue)"
+        loopStateLabel.text = "Looping: disabled"
         
         audioManager = AudioManager()
         audioManager.delegate = self
@@ -36,7 +41,13 @@ class AppViewController: UIViewController {
 // MARK: - AudioManagerDelegate
 
 extension AppViewController: AudioManagerDelegate {
-    func audioManager(_ audioManager: AudioManager, didSet loopState: Bool) {
+    func audioManager(_ audioManager: AudioManager, currentSample: String) {
+        DispatchQueue.main.async {
+            self.currentSampleLabel.text = "Selected sample: \(currentSample)"
+        }
+    }
+    
+    func audioManager(_ audioManager: AudioManager, loopState: Bool) {
         DispatchQueue.main.async {
             self.loopStateLabel.text = loopState ? "Looping: enabled" : "Looping: disabled"
         }

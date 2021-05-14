@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		14216A5D264BF5400017BED7 /* truck.wav in Resources */ = {isa = PBXBuildFile; fileRef = 14216A5C264BF5400017BED7 /* truck.wav */; };
 		144833C0264BCBD30008027A /* DoubleActionClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 144833BF264BCBD30008027A /* DoubleActionClassifier.mlmodel */; };
 		144833C3264BCC000008027A /* DoubleActionClassifier+PredictAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833C2264BCC000008027A /* DoubleActionClassifier+PredictAction.swift */; };
 		144833C6264BCC780008027A /* DoubleActionClassifier+Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833C5264BCC780008027A /* DoubleActionClassifier+Singleton.swift */; };
@@ -15,8 +14,9 @@
 		144833CD264BCF1F0008027A /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833CC264BCF1F0008027A /* Camera.swift */; };
 		144833D1264BE2CD0008027A /* Processor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833D0264BE2CD0008027A /* Processor.swift */; };
 		144833D4264BE5530008027A /* DataFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833D3264BE5530008027A /* DataFrame.swift */; };
-		144833D7264BF0620008027A /* kick.wav in Resources */ = {isa = PBXBuildFile; fileRef = 144833D6264BF0620008027A /* kick.wav */; };
 		144833DB264BF07E0008027A /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144833DA264BF07E0008027A /* AudioManager.swift */; };
+		14771326264E71E1004A53B8 /* Kick.wav in Resources */ = {isa = PBXBuildFile; fileRef = 14771325264E71E1004A53B8 /* Kick.wav */; };
+		1477132D264EBB44004A53B8 /* Amen.wav in Resources */ = {isa = PBXBuildFile; fileRef = 1477132C264EBB44004A53B8 /* Amen.wav */; };
 		14D6DD2D264BB34700B217DD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D6DD2C264BB34700B217DD /* AppDelegate.swift */; };
 		14D6DD31264BB34900B217DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14D6DD30264BB34900B217DD /* Assets.xcassets */; };
 		14D6DD40264BB52600B217DD /* AppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D6DD3F264BB52600B217DD /* AppViewController.swift */; };
@@ -25,10 +25,10 @@
 		14D6DD56264BBB5400B217DD /* Prediction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D6DD55264BBB5400B217DD /* Prediction.swift */; };
 		14D6DD59264BBC0200B217DD /* BodyPoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D6DD58264BBC0200B217DD /* BodyPoints.swift */; };
 		14D6DD60264BBD0A00B217DD /* Human.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D6DD5F264BBD0A00B217DD /* Human.swift */; };
+		14D9E3F4264ED4DE000B77DB /* Truck.wav in Resources */ = {isa = PBXBuildFile; fileRef = 14D9E3F3264ED4DE000B77DB /* Truck.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		14216A5C264BF5400017BED7 /* truck.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = truck.wav; sourceTree = "<group>"; };
 		144833BF264BCBD30008027A /* DoubleActionClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DoubleActionClassifier.mlmodel; sourceTree = "<group>"; };
 		144833C2264BCC000008027A /* DoubleActionClassifier+PredictAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DoubleActionClassifier+PredictAction.swift"; sourceTree = "<group>"; };
 		144833C5264BCC780008027A /* DoubleActionClassifier+Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DoubleActionClassifier+Singleton.swift"; sourceTree = "<group>"; };
@@ -36,8 +36,9 @@
 		144833CC264BCF1F0008027A /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		144833D0264BE2CD0008027A /* Processor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Processor.swift; sourceTree = "<group>"; };
 		144833D3264BE5530008027A /* DataFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFrame.swift; sourceTree = "<group>"; };
-		144833D6264BF0620008027A /* kick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = kick.wav; sourceTree = "<group>"; };
 		144833DA264BF07E0008027A /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
+		14771325264E71E1004A53B8 /* Kick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Kick.wav; sourceTree = "<group>"; };
+		1477132C264EBB44004A53B8 /* Amen.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Amen.wav; sourceTree = "<group>"; };
 		14D6DD29264BB34700B217DD /* bodySampler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bodySampler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14D6DD2C264BB34700B217DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14D6DD30264BB34900B217DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -49,6 +50,7 @@
 		14D6DD55264BBB5400B217DD /* Prediction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prediction.swift; sourceTree = "<group>"; };
 		14D6DD58264BBC0200B217DD /* BodyPoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BodyPoints.swift; sourceTree = "<group>"; };
 		14D6DD5F264BBD0A00B217DD /* Human.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Human.swift; sourceTree = "<group>"; };
+		14D9E3F3264ED4DE000B77DB /* Truck.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Truck.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,8 +111,9 @@
 		14D6DD2B264BB34700B217DD /* bodySampler */ = {
 			isa = PBXGroup;
 			children = (
-				14216A5C264BF5400017BED7 /* truck.wav */,
-				144833D6264BF0620008027A /* kick.wav */,
+				14771325264E71E1004A53B8 /* Kick.wav */,
+				14D9E3F3264ED4DE000B77DB /* Truck.wav */,
+				1477132C264EBB44004A53B8 /* Amen.wav */,
 				144833D9264BF0660008027A /* Audio */,
 				144833BE264BCB500008027A /* Classifier */,
 				14D6DD54264BBB3000B217DD /* Model */,
@@ -210,10 +213,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14D9E3F4264ED4DE000B77DB /* Truck.wav in Resources */,
 				14D6DD51264BBB0400B217DD /* LaunchScreen.storyboard in Resources */,
+				1477132D264EBB44004A53B8 /* Amen.wav in Resources */,
+				14771326264E71E1004A53B8 /* Kick.wav in Resources */,
 				14D6DD31264BB34900B217DD /* Assets.xcassets in Resources */,
-				144833D7264BF0620008027A /* kick.wav in Resources */,
-				14216A5D264BF5400017BED7 /* truck.wav in Resources */,
 				14D6DD45264BB5BD00B217DD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
