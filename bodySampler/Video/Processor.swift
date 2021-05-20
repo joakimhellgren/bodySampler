@@ -11,27 +11,25 @@ import CoreImage
 
 protocol ProcessorChainDelegate: AnyObject {
     func processorChain(_ chain: ProcessorChain,
-                        didDetect poses: [Human]?,
-                        in frame: DataFrame)
+                        frame: DataFrame, points: BodyPoints)
     
     func processorChain(_ chain: ProcessorChain,
-                        didPredict prediction: Prediction,
-                        for frames: Int)
+                        didPredict prediction: Prediction)
     
-    func processorChain(_ chain: ProcessorChain,
-                        extractedPoints points: BodyPoints)
 }
 
 struct ProcessorChain {
     
+    /// set to receive human poses and predictions
     weak var delegate: ProcessorChainDelegate?
     
-    /// when set; begins to extract poses and predict actions.
+    /// when property is set; begins to extract poses and predict actions.
     var upstreamFramePublisher: AnyPublisher<Frame, Never>! {
         didSet { buildProcessorChain() }
     }
-    /// cancellation for the active processing chain
+    /// cancellation token for the active processing chain
     private var frameProcessorChain: AnyCancellable?
+    
     private let humanBodyPoseRequest = VNDetectHumanBodyPoseRequest()
     private let classifier = DoubleActionClassifier.shared
     
@@ -112,10 +110,9 @@ extension ProcessorChain {
                 return point
             }
         }
-        self.delegate?.processorChain(self, extractedPoints: BodyPoints(points: points))
-        
+
         DispatchQueue.main.async {
-            self.delegate?.processorChain(self, didDetect: poses, in: DataFrame(frame: frame))
+            self.delegate?.processorChain(self, frame: DataFrame(frame: frame), points: BodyPoints(points: points))
         }
         
         return poses
@@ -202,7 +199,7 @@ extension ProcessorChain {
     private func sendPrediction(_ prediction: Prediction) {
         
         DispatchQueue.main.async {
-            self.delegate?.processorChain(self, didPredict: prediction, for: windowStride)
+            self.delegate?.processorChain(self, didPredict: prediction)
         }
     }
     

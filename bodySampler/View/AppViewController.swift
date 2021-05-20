@@ -23,8 +23,8 @@ class AppViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = true
         
         currentSampleLabel.text = "Selected sample: \(AudioState.currentSample.rawValue)"
-        predictionLabel.text = "Latest action: \(PredictionLabel.kick.rawValue)"
-        loopStateLabel.text = "Looping: disabled"
+        predictionLabel.text = "Latest action: "
+        loopStateLabel.text = AudioState.isRepeatingSample ? "Looping: enabled" : "Looping: disabled"
         
         audioManager = AudioManager()
         audioManager.delegate = self
@@ -67,20 +67,14 @@ extension AppViewController: CameraDelegate {
 
 extension AppViewController: ProcessorChainDelegate {
     
-    func processorChain(_ chain: ProcessorChain, didDetect poses: [Human]?, in frame: DataFrame) {
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.drawScreen(frame.image)
-        }
+    func processorChain(_ chain: ProcessorChain, frame: DataFrame, points: BodyPoints) {
+        drawScreen(frame.image)
+        audioManager.observeMotions(poses: points)
     }
     
-    func processorChain(_ chain: ProcessorChain, didPredict prediction: Prediction, for frames: Int) {
-
+    func processorChain(_ chain: ProcessorChain, didPredict prediction: Prediction) {
         updateActionLabel(prediction.label)
         audioManager.validatePrediction(prediction)
-    }
-    
-    func processorChain(_ chain: ProcessorChain, extractedPoints points: BodyPoints) {
-        self.audioManager.observeMotions(poses: points)
     }
 }
 
@@ -105,7 +99,7 @@ extension AppViewController {
             cgContext.draw(frame, in: imageRect)
         }
         
-        DispatchQueue.main.async { self.imageView.image = frames }
+        imageView.image = frames
     }
     
     private func updateActionLabel(_ label: String) {

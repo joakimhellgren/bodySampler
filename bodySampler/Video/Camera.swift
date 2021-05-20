@@ -20,14 +20,16 @@ protocol CameraDelegate: AnyObject {
 
 class Camera: NSObject {
     
-    /// receive detected human + prediction notifications
+    /// set property to receive human + prediction notifications
     weak var delegate: CameraDelegate! { didSet { createFramePublisher() } }
     
-    /// notifies delegate each time a new frame is captured
+    /// video frame source
     private let captureSession = AVCaptureSession()
     
-    /// combine publisher that forward frames as session creates them
+    /// initial combine publisher that forward frames as session creates them
     private var framePublisher: PassthroughSubject<Frame, Never>?
+    
+    /// thread used by capture session to publish frames
     private let captureQueue = DispatchQueue(label: "Capture Queue", qos: .userInitiated)
     
 }
@@ -36,7 +38,7 @@ class Camera: NSObject {
 extension Camera: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput frame: Frame, from connection: AVCaptureConnection) {
         
-        /// send frames to publisher
+        /// send frame(s) through publisher
         framePublisher?.send(frame)
     }
 }
@@ -60,7 +62,7 @@ extension Camera {
         /// Create a generic publisher by type erasing the passthrough publisher.
         let genericFramePublisher = passthroughSubject.eraseToAnyPublisher()
         
-        /// Send the publisher to the Camera delegate.
+        /// Send the generic publisher to the Camera delegate.
         delegate.camera(self, didCreate: genericFramePublisher)
     }
     
@@ -68,7 +70,7 @@ extension Camera {
         
         if captureSession.isRunning { captureSession.stopRunning() }
         
-        /// restart the session after this method returns
+        /// start / restart the session after this method returns
         defer { if !captureSession.isRunning { captureSession.startRunning() } }
         
         captureSession.sessionPreset = .high
@@ -84,24 +86,32 @@ extension Camera {
             return nil
         }
         
+        /// configrue the capture device to use the best available
+        /// frame rate range around the target frame rate
         do {
             try captureDevice.lockForConfiguration()
         } catch { return nil }
         
-        defer { captureDevice.unlockForConfiguration() }
-        
+        /// sort available frame rate ranges by descending
         let sortedRanges = captureDevice.activeFormat.videoSupportedFrameRateRanges.sorted {
             $0.maxFrameRate > $1.maxFrameRate
         }
         
+        /// get highest maxFrameRate
         guard let range = sortedRanges.first else { return nil }
+        
+        /// check so target frarme rate is not below range
         guard framerate >= range.minFrameRate else { return nil }
         
+        /// define duration based on target frame rate
         let duration = CMTime(value: 1, timescale: CMTimeScale(framerate))
         
+        /// if target frame rate is within the range use it as the minimum
         let inRange = framerate <= range.maxFrameRate
         captureDevice.activeVideoMinFrameDuration = inRange ? duration : range.minFrameDuration
+        captureDevice.activeVideoMaxFrameDuration = range.maxFrameDuration
         
+        /// create input from camera
         guard let captureInput = try? AVCaptureDeviceInput(device: captureDevice) else { return nil }
         
         /// set sample buffer to view controller on capture queue
